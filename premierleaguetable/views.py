@@ -38,32 +38,43 @@ def fixtures_view(request):
     if request.method == 'POST':
         HomeTeam = request.POST['HomeTeam']
         AwayTeam = request.POST['AwayTeam']
-        HomeTeamGoals = request.POST['HomeGoals']
-        AwayTeamGoals = request.POST['AwayGoals']
+        HomeTeamGoals = int(request.POST['HomeGoals'])
+        AwayTeamGoals = int(request.POST['AwayGoals'])
 
         if HomeTeam == AwayTeam:
             messages.error(request, 'Home Team and Away Team can not be the same')
         if HomeTeam == 'Teams' or AwayTeam == 'Teams':
             messages.error(request, 'Home or Away Team not selected')
 
+        # Home Teams Wins
         if HomeTeamGoals > AwayTeamGoals:
-            print(HomeTeam)
-            PremierTable.objects.filter(Club=HomeTeam).update(Pts=F('Pts') + 3)
-
-            # # .update(Pts=F('Pts') + 3, MP=F('MP') + 1,)
-            # # queryset.Pts = 3
-
+            PremierTable.objects.filter(Club=HomeTeam).update(MP=F('MP') + 1, W=F('W') + 1,
+                                                              GF=F('GF') + HomeTeamGoals, GA=F('GA') + AwayTeamGoals,
+                                                              GD=F('GD') + (HomeTeamGoals - AwayTeamGoals),
+                                                              Pts=F('Pts') + 3)
+            PremierTable.objects.filter(Club=AwayTeam).update(MP=F('MP') + 1, L=F('L') + 1,
+                                                              GF=F('GF') + AwayTeamGoals, GA=F('GA') + HomeTeamGoals,
+                                                              GD=F('GD') + (AwayTeamGoals - HomeTeamGoals))
+        # Away Team Wins
         elif AwayTeamGoals > HomeTeamGoals:
-            print("Away Team Won")
+            PremierTable.objects.filter(Club=AwayTeam).update(MP=F('MP') + 1, W=F('W') + 1,
+                                                              GF=F('GF') + AwayTeamGoals, GA=F('GA') + HomeTeamGoals,
+                                                              GD=F('GD') + (AwayTeamGoals - HomeTeamGoals),
+                                                              Pts=F('Pts') + 3)
+        # Tie
         else:
-            print("Tie")
-            queryset = PremierTable.objects.filter(Club=AwayTeam).update(Pts=F('Pts') + 3, MP=F('MP') + 1,)
-            # queryset.Pts = 3
+            PremierTable.objects.filter(Club=HomeTeam).update(MP=F('MP') + 1, D=F('D') + 1,
+                                                              GF=F('GF') + HomeTeamGoals, GA=F('GA') + AwayTeamGoals,
+                                                              GD=F('GD') + (HomeTeamGoals - AwayTeamGoals),
+                                                              Pts=F('Pts') + 1)
+            PremierTable.objects.filter(Club=AwayTeam).update(MP=F('MP') + 1, L=F('L') + 1,
+                                                              GF=F('GF') + AwayTeamGoals, GA=F('GA') + HomeTeamGoals,
+                                                              GD=F('GD') + (AwayTeamGoals - HomeTeamGoals))
+
 
     with open("premier-league.csv") as data:
         file = data.readlines()
         teams = [team.replace('\n', '') for team in file]
-        print(teams)
 
     return render(request, 'fixtures.html', {'teams': teams})
 
