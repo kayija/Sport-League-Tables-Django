@@ -8,11 +8,57 @@
 </head>
 <body>
 <div class="container mt-5">
-  <h1>League Table</h1>
+  <h1>Premier League Table</h1>
     <!--because I used ListView the table object name will become the tablename-list-->
-    {% for post in premiertable_list %}
-    <p>{{ post.Club }}</p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Club</th>
+            <th>MP</th>
+            <th>W</th>
+            <th>D</th>
+            <th>L</th>
+            <th>GF</th>
+            <th>GA</th>
+            <th>GD</th>
+            <th>Pts</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in premiertable_list %}
+        <tr>
+            <td>
+            {{ post.Club }}
+            </td>
+            <td>
+            {{ post.MP}}
+            </td>
+            <td>
+            {{ post.W }}
+            </td>
+            <td>
+            {{ post.D }}
+            </td>
+            <td>
+            {{ post.L }}
+            </td>
+            <td>
+            {{ post.GF }}
+            </td>
+            <td>
+            {{ post.GA }}
+            </td>
+            <td>
+            {{ post.GD }}
+            </td>
+            <td>
+            {{ post.Pts }}
+            </td>
+        </tr>
     {% endfor %}
+        </tbody>
+    </table>
+
 
 </div>
 

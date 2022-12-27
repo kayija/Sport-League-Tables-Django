@@ -9,7 +9,7 @@ from django.db.models import F
 # Create your views here.
 # DetailView is for a template that get its data from a model(database)
 class TableView(generic.ListView):
-    queryset = PremierTable.objects.all()
+    queryset = PremierTable.objects.all().order_by("-Pts")
     template_name = 'index.html'
 
 
@@ -67,10 +67,10 @@ def fixtures_view(request):
                                                               GF=F('GF') + HomeTeamGoals, GA=F('GA') + AwayTeamGoals,
                                                               GD=F('GD') + (HomeTeamGoals - AwayTeamGoals),
                                                               Pts=F('Pts') + 1)
-            PremierTable.objects.filter(Club=AwayTeam).update(MP=F('MP') + 1, L=F('L') + 1,
+            PremierTable.objects.filter(Club=AwayTeam).update(MP=F('MP') + 1, D=F('D') + 1,
                                                               GF=F('GF') + AwayTeamGoals, GA=F('GA') + HomeTeamGoals,
-                                                              GD=F('GD') + (AwayTeamGoals - HomeTeamGoals))
-
+                                                              GD=F('GD') + (AwayTeamGoals - HomeTeamGoals),
+                                                              Pts=F('Pts') + 1)
 
     with open("premier-league.csv") as data:
         file = data.readlines()
