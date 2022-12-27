@@ -9,10 +9,12 @@ from django.db.models import F
 # Create your views here.
 # DetailView is for a template that get its data from a model(database)
 class TableView(generic.ListView):
-    queryset = PremierTable.objects.all().order_by("-Pts")
+    # This will order the table by Pts first then by Goal difference if a team has the same points.
+    queryset = PremierTable.objects.all().order_by("-Pts", "-GD").values()
     template_name = 'index.html'
 
 
+# This function will pull data from the csv file and add it to the database
 def updatetable():
     with open("premier-league.csv") as data:
         file = data.readlines()
@@ -34,7 +36,7 @@ def admin_check(user):
 # view for the fixtures page
 @user_passes_test(admin_check)
 def fixtures_view(request):
-    #updatetable()
+    # updatetable()
     if request.method == 'POST':
         HomeTeam = request.POST['HomeTeam']
         AwayTeam = request.POST['AwayTeam']
@@ -71,7 +73,7 @@ def fixtures_view(request):
                                                               GF=F('GF') + AwayTeamGoals, GA=F('GA') + HomeTeamGoals,
                                                               GD=F('GD') + (AwayTeamGoals - HomeTeamGoals),
                                                               Pts=F('Pts') + 1)
-
+    # this will autopopulate the dropdown for the admin to use to add the teams
     with open("premier-league.csv") as data:
         file = data.readlines()
         teams = [team.replace('\n', '') for team in file]
